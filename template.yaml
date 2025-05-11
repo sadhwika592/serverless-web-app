@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  WebFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: handler.lambda_handler
+      Runtime: python3.9
+      CodeUri: src/
+      MemorySize: 128
+      Timeout: 5
+      Environment:
+        Variables:
+          TABLE_NAME: WebAppTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: WebAppTable
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /submit
+            Method: post
+
+  WebAppTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: WebAppTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAYPERREQUEST
